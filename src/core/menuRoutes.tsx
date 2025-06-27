@@ -3,6 +3,7 @@ import UserForm from "../modules/users/UserForm";
 import Products from "../modules/products/products";
 import Order from "../modules/order/order";
 import Reports from "../reports/reports";
+import Inicio from "../modules/dashboard/Inicio";
 
 export interface AppRoute {
   path: string;
@@ -14,7 +15,7 @@ export interface AppRoute {
 const routes: AppRoute[] = [
   {
     path: "/dashboard",
-    element: <UserForm />,
+    element: <Inicio />,
     label: "Inicio",
     icon: "HomeOutlined",
   },

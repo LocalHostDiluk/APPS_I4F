@@ -4,6 +4,7 @@ import Dashboard from "./modules/dashboard/Dashboard";
 import routes from "./core/menuRoutes";
 import AuthRoutes from "./auth/AuthRoutes";
 import LoginForm from "./modules/users/LoginForm";
+import RegisterForm from "./modules/users/RegForm";
 
 function App() {
   return (
@@ -12,7 +13,7 @@ function App() {
         <Routes>
           <Route path="/login" element={<LoginForm />} />
 
-          <Route />
+          <Route path="/registro" element={<RegisterForm/>}/>
 
           <Route
             path="/"
@@ -23,7 +24,6 @@ function App() {
             }
           >
             <Route index element={<Dashboard />} />
-
             {routes.map((route) => (
               <Route
                 key={route.path}
