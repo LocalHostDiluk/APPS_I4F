@@ -8,7 +8,6 @@ import {
   Button,
   message,
   Space,
-  Popconfirm,
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import axios from "axios";
@@ -29,6 +28,7 @@ export default function ReportData() {
   const [reports, setReports] = useState<Report[]>([]);
   const [search, setSearch] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
+  const [modalMode, setModalMode] = useState<"crear" | "editar" | "eliminar">("crear");
   const [editingReport, setEditingReport] = useState<Report | null>(null);
   const [form] = Form.useForm();
 
@@ -52,33 +52,34 @@ export default function ReportData() {
       report.description?.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleEdit = (report: Report) => {
-    setEditingReport(report);
-    form.setFieldsValue(report);
-    setModalVisible(true);
-  };
-
-  const handleAdd = () => {
-    setEditingReport(null);
-    form.resetFields();
+  const openModal = (mode: "crear" | "editar" | "eliminar", report?: Report) => {
+    setModalMode(mode);
+    setEditingReport(report || null);
+    if (mode !== "eliminar") {
+      form.setFieldsValue(report || {});
+    }
     setModalVisible(true);
   };
 
   const handleSave = async () => {
     try {
-      const values = await form.validateFields();
-
-      if (editingReport) {
-        // Actualizar reporte
-        await axios.put(
-          `http://localhost:3000/app/actualizarReporte/${editingReport._id}`,
-          values
+      if (modalMode === "eliminar" && editingReport) {
+        await axios.delete(
+          `http://localhost:3000/app/eliminarReporte/${editingReport._id}`
         );
-        message.success("Reporte actualizado correctamente");
+        message.success("Reporte eliminado");
       } else {
-        // Crear nuevo reporte
-        await axios.post("http://localhost:3000/app/crearReporte", values);
-        message.success("Reporte creado correctamente");
+        const values = await form.validateFields();
+        if (editingReport) {
+          await axios.put(
+            `http://localhost:3000/app/actualizarReporte/${editingReport._id}`,
+            values
+          );
+          message.success("Reporte actualizado correctamente");
+        } else {
+          await axios.post("http://localhost:3000/app/crearReporte", values);
+          message.success("Reporte creado correctamente");
+        }
       }
 
       setModalVisible(false);
@@ -86,18 +87,6 @@ export default function ReportData() {
       fetchReports();
     } catch (err) {
       console.error("Error saving report:", err);
-    }
-  };
-
-  const handleDelete = async (reportId: string) => {
-    try {
-      await axios.delete(
-        `http://localhost:3000/app/eliminarReporte/${reportId}`
-      );
-      message.success("Reporte eliminado");
-      fetchReports();
-    } catch (err) {
-      console.error("Error deleting report:", err);
     }
   };
 
@@ -127,20 +116,12 @@ export default function ReportData() {
       key: "acciones",
       render: (_: any, record: Report) => (
         <Space>
-          <Button type="link" onClick={() => handleEdit(record)}>
+          <Button type="link" onClick={() => openModal("editar", record)}>
             Editar
           </Button>
-          <Popconfirm
-            title="¿Eliminar reporte?"
-            description="Esta acción no se puede deshacer"
-            okText="Sí, eliminar"
-            cancelText="Cancelar"
-            onConfirm={() => handleDelete(record._id)}
-          >
-            <Button type="link" danger>
-              Eliminar
-            </Button>
-          </Popconfirm>
+          <Button type="link" danger onClick={() => openModal("eliminar", record)}>
+            Eliminar
+          </Button>
         </Space>
       ),
     },
@@ -158,7 +139,7 @@ export default function ReportData() {
           allowClear
           style={{ width: 300 }}
         />
-        <Button type="primary" onClick={handleAdd}>
+        <Button type="primary" onClick={() => openModal("crear")}>
           Crear Reporte
         </Button>
       </div>
@@ -171,51 +152,60 @@ export default function ReportData() {
       />
 
       <Modal
-        title={editingReport ? "Editar Reporte" : "Crear Reporte"}
+        title={
+          modalMode === "crear"
+            ? "Crear Reporte"
+            : modalMode === "editar"
+            ? "Editar Reporte"
+            : "Eliminar Reporte"
+        }
         open={modalVisible}
         onCancel={() => setModalVisible(false)}
         onOk={handleSave}
-        okText="Guardar"
+        okText={modalMode === "eliminar" ? "Eliminar" : "Guardar"}
         cancelText="Cancelar"
       >
-        <Form form={form} layout="vertical">
-          <Form.Item
-            name="title"
-            label="Título"
-            rules={[
-              { required: true, message: "El título es obligatorio" },
-              { min: 3, message: "Mínimo 3 caracteres" },
-              { max: 100, message: "Máximo 100 caracteres" },
-            ]}
-          >
-            <Input />
-          </Form.Item>
+        {modalMode === "eliminar" ? (
+          <p>¿Deseas eliminar este reporte?</p>
+        ) : (
+          <Form form={form} layout="vertical">
+            <Form.Item
+              name="title"
+              label="Título"
+              rules={[
+                { required: true, message: "El título es obligatorio" },
+                { min: 3, message: "Mínimo 3 caracteres" },
+                { max: 100, message: "Máximo 100 caracteres" },
+              ]}
+            >
+              <Input />
+            </Form.Item>
 
-          <Form.Item
-            name="description"
-            label="Descripción"
-            rules={[
-              { required: true, message: "La descripción es obligatoria" },
-              { min: 10, message: "Mínimo 10 caracteres" },
-              { max: 300, message: "Máximo 300 caracteres" },
-            ]}
-          >
-            <Input.TextArea rows={3} />
-          </Form.Item>
+            <Form.Item
+              name="description"
+              label="Descripción"
+              rules={[
+                { required: true, message: "La descripción es obligatoria" },
+                { min: 10, message: "Mínimo 10 caracteres" },
+                { max: 300, message: "Máximo 300 caracteres" },
+              ]}
+            >
+              <Input.TextArea rows={3} />
+            </Form.Item>
 
-          <Form.Item
-            name="status"
-            label="Estado"
-            rules={[{ required: true, message: "Selecciona un estado" }]}
-            initialValue="pendiente"
-          >
-            <Select placeholder="Selecciona estado del reporte">
-              <Option value="pendiente">Pendiente</Option>
-              <Option value="completado">Completado</Option>
-              <Option value="cancelado">Cancelado</Option>
-            </Select>
-          </Form.Item>
-        </Form>
+            <Form.Item
+              name="status"
+              label="Estado"
+              rules={[{ required: true, message: "Selecciona un estado" }]}
+            >
+              <Select placeholder="Selecciona estado del reporte">
+                <Option value="pendiente">Pendiente</Option>
+                <Option value="completado">Completado</Option>
+                <Option value="cancelado">Cancelado</Option>
+              </Select>
+            </Form.Item>
+          </Form>
+        )}
       </Modal>
     </div>
   );

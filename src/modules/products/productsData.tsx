@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Table, Input, Button, message, Space } from "antd";
+import { Table, Input, Button, message, Space, Popconfirm } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import axios from "axios";
 import ModalForm from "../../components/ModalForm";
@@ -81,11 +81,7 @@ export default function ProductData() {
       required: true,
       rules: [
         { required: true, message: "El precio es obligatorio" },
-        {
-          type: "number",
-          min: 0.01,
-          message: "Debe ser mayor a 0",
-        },
+        { type: "number", min: 0.01, message: "Debe ser mayor a 0" },
         {
           validator: (_: any, value: any) =>
             /^\d+(\.\d{1,2})?$/.test(String(value))
@@ -130,11 +126,12 @@ export default function ProductData() {
     } finally {
       setConfirmLoading(false);
       setModalVisible(false);
+      setEditingProduct(null);
     }
   };
 
   const columns: ColumnsType<Product> = [
-    { title: "ID Mongo", dataIndex: "_id", key: "_id" },
+    { title: "ID", dataIndex: "_id", key: "_id" },
     { title: "Nombre", dataIndex: "name", key: "name" },
     { title: "Descripción", dataIndex: "description", key: "description" },
     { title: "Cantidad", dataIndex: "cant", key: "cant" },
@@ -190,7 +187,10 @@ export default function ProductData() {
       <ModalForm
         visible={modalVisible}
         mode={modalMode}
-        onCancel={() => setModalVisible(false)}
+        onCancel={() => {
+          setModalVisible(false);
+          setEditingProduct(null);
+        }}
         onOk={handleOk}
         initialValues={editingProduct || {}}
         fields={fields}

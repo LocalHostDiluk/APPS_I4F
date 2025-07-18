@@ -33,7 +33,7 @@ export default function Dashboard() {
     try {
       const [productRes, orderRes, userRes] = await Promise.all([
         axios.get("http://localhost:3000/app/products"),
-        axios.get("http://localhost:3000/app/orders"),
+        axios.get("http://localhost:3000/app/order"),
         axios.get("http://localhost:3000/app/users"),
       ]);
 

@@ -34,13 +34,7 @@ const ModalForm: React.FC<ModalFormProps> = ({
 
   const handleOk = () => {
     if (isDelete) {
-      Modal.confirm({
-        title: "¿Estás seguro?",
-        content: "Esta acción no se puede deshacer.",
-        okText: "Sí, eliminar",
-        cancelText: "Cancelar",
-        onOk: () => onOk(initialValues),
-      });
+      onOk(initialValues); // ejecuta directamente sin validar
     } else {
       form.validateFields().then((values) => onOk(values));
     }
@@ -61,6 +55,7 @@ const ModalForm: React.FC<ModalFormProps> = ({
       okText={mode === "eliminar" ? "Eliminar" : "Guardar"}
       cancelText="Cancelar"
       confirmLoading={confirmLoading}
+      okButtonProps={mode === "eliminar" ? { danger: true } : {}}
     >
       {!isDelete ? (
         <Form form={form} layout="vertical" initialValues={initialValues}>
@@ -110,7 +105,10 @@ const ModalForm: React.FC<ModalFormProps> = ({
           })}
         </Form>
       ) : (
-        <p>¿Deseas eliminar este producto?</p>
+        <p>
+          ¿Estás seguro de que deseas eliminar este producto? Esta acción no se
+          puede deshacer.
+        </p>
       )}
     </Modal>
   );

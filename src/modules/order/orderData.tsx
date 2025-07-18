@@ -33,7 +33,7 @@ interface OrderProduct {
 
 interface Order {
   _id: string;
-  user: string; // Es un string (el ID del usuario)
+  user: string;
   status: string;
   subtotal: string;
   total: string;
@@ -216,7 +216,6 @@ export default function OrderData() {
 
       <Table columns={columns} dataSource={filteredOrders} rowKey="_id" />
 
-      {/* Modal cambiar estado */}
       <Modal
         title="Actualizar Estado de Orden"
         open={modalVisible}
@@ -236,7 +235,6 @@ export default function OrderData() {
         </Select>
       </Modal>
 
-      {/* Modal crear orden */}
       <Modal
         title="Crear Orden"
         open={formVisible}
