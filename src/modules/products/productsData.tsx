@@ -1,8 +1,18 @@
 import { useEffect, useState } from "react";
-import { Table, Input, Button, message, Space} from "antd";
+import { Table, Input, Button, message, Space } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import axios from "axios";
 import ModalForm from "../../components/ModalForm";
+
+type FieldType = "text" | "number" | "select" | "textarea";
+
+interface FieldConfig {
+  name: string;
+  label: string;
+  type: FieldType;
+  required: boolean;
+  rules: any[];
+}
 
 interface Product {
   _id: string;
@@ -39,19 +49,13 @@ export default function ProductData() {
     fetchProducts();
   }, []);
 
-  const fields = [
+  const fields: FieldConfig[] = [
     {
-      name: "name",
+      name: "nombre",
       label: "Nombre",
-      type: "text",
+      type: "text" as const,
       required: true,
-      rules: [
-        { required: true, message: "El nombre es obligatorio" },
-        {
-          pattern: /^[A-Za-zÁÉÍÓÚÑáéíóúñ0-9\s]{3,50}$/,
-          message: "3-50 caracteres: letras, números o espacios",
-        },
-      ],
+      rules: [{ required: true, message: "Nombre obligatorio" }],
     },
     {
       name: "description",
