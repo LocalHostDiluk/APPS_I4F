@@ -99,9 +99,8 @@ export default function UserData() {
 
       fetchUsers();
       setModalVisible(false);
-    } catch (err: any) {
-      console.error(err);
-      message.error("Error al guardar usuario");
+    } catch (err) {
+      console.error("Error", err);
     } finally {
       setLoading(false);
     }

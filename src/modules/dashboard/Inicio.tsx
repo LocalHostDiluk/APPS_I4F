@@ -66,6 +66,7 @@ export default function Dashboard() {
       );
       setProductByCategory(formattedCategories);
     } catch (err) {
+      console.error("Error fetching data:", err);
       message.error("Error cargando el dashboard");
     }
   };

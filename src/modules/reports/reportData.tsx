@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Table,
   Input,
@@ -38,7 +38,7 @@ export default function ReportData() {
       const activos = (res.data || []).filter((r: Report) => !r.deleteDate);
       setReports(activos);
     } catch (error) {
-      message.error("Error al obtener reportes");
+      console.error("Error fetching reports:", error);
     }
   };
 
@@ -85,7 +85,7 @@ export default function ReportData() {
       setEditingReport(null);
       fetchReports();
     } catch (err) {
-      message.error("Error al guardar el reporte");
+      console.error("Error saving report:", err);
     }
   };
 
@@ -97,7 +97,7 @@ export default function ReportData() {
       message.success("Reporte eliminado");
       fetchReports();
     } catch (err) {
-      message.error("Error al eliminar el reporte");
+      console.error("Error deleting report:", err);
     }
   };
 
