@@ -287,31 +287,14 @@ export default function OrderData() {
                         showSearch
                         placeholder="Producto"
                         style={{ width: 200 }}
-                        optionFilterProp="children"
-                        filterOption={(input, option) =>
-                          typeof option?.children === "string"
-                            ? option.children
-                                .toLowerCase()
-                                .includes(input.toLowerCase())
-                            : false
-                        }
-                        notFoundContent="Producto no encontrado"
-                        onChange={(productId) => {
-                          const product = productList.find(
-                            (p) => p._id === productId
-                          );
-                          const current = form.getFieldValue("products") || [];
-                          const updated = [...current];
-                          updated[name] = {
-                            ...updated[name],
-                            quantity: 1,
-                            price: product?.price || 0,
-                          };
-                          form.setFieldsValue({ products: updated });
-                        }}
+                        optionFilterProp="label"
                       >
                         {productList.map((p) => (
-                          <Option key={p._id} value={p._id}>
+                          <Option
+                            key={p._id}
+                            value={p._id}
+                            label={`${p.name} - ${p.description}`}
+                          >
                             {p.name} - {p.description}
                           </Option>
                         ))}
