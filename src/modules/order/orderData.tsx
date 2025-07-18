@@ -289,9 +289,11 @@ export default function OrderData() {
                         style={{ width: 200 }}
                         optionFilterProp="children"
                         filterOption={(input, option) =>
-                          (option?.children as string)
-                            ?.toLowerCase()
-                            .includes(input.toLowerCase())
+                          typeof option?.children === "string"
+                            ? option.children
+                                .toLowerCase()
+                                .includes(input.toLowerCase())
+                            : false
                         }
                         notFoundContent="Producto no encontrado"
                         onChange={(productId) => {
