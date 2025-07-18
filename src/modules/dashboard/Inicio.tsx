@@ -26,8 +26,12 @@ export default function Dashboard() {
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
   const [users, setUsers] = useState([]);
-  const [ordersByMonth, setOrdersByMonth] = useState([]);
-  const [productByCategory, setProductByCategory] = useState([]);
+  const [ordersByMonth, setOrdersByMonth] = useState<
+    { month: string; orders: number }[]
+  >([]);
+  const [productByCategory, setProductByCategory] = useState<
+    { category: string; count: number }[]
+  >([]);
 
   const fetchAllData = async () => {
     try {
@@ -42,7 +46,7 @@ export default function Dashboard() {
       setUsers(userRes.data.userList);
 
       // Procesar órdenes por mes
-      const monthlyOrders = {};
+      const monthlyOrders: Record<string, number> = {};
       orderRes.data.forEach((order: any) => {
         const date = new Date(order.createDate);
         const key = `${date.toLocaleString("default", {
