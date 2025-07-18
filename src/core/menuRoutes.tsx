@@ -1,9 +1,9 @@
 import type { JSX } from "react";
-import UserForm from "../modules/users/UserForm";
-import Products from "../modules/products/products";
-import Order from "../modules/order/order";
-import Reports from "../reports/reports";
 import Inicio from "../modules/dashboard/Inicio";
+import OrderData from "../modules/order/orderData";
+import ProductData from "../modules/products/productsData";
+import UserData from "../modules/users/UserData";
+import ReportData from "../modules/reports/reportData";
 
 export interface AppRoute {
   path: string;
@@ -21,25 +21,25 @@ const routes: AppRoute[] = [
   },
   {
     path: "/users",
-    element: <UserForm />,
+    element: <UserData />,
     label: "Usuarios",
     icon: "UserOutlined",
   },
   {
     path: "/products",
-    element: <Products />,
+    element: <ProductData />,
     label: "Productos",
     icon: "ShoppingOutlined",
   },
   {
     path: "/orders",
-    element: <Order />,
+    element: <OrderData />,
     label: "Pedidos",
     icon: "ProfileOutlined",
   },
   {
     path: "/reports",
-    element: <Reports />,
+    element: <ReportData />,
     label: "Reportes",
     icon: "BarChartOutlined",
   },

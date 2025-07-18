@@ -1,6 +1,7 @@
 import React from "react";
 import type { FormProps } from "antd";
 import { Button, Checkbox, Form, Input, Select } from "antd";
+import { useNavigate } from "react-router-dom";
 
 const { Option } = Select;
 
@@ -24,9 +25,38 @@ type FieldType = {
 
 function RegisterForm() {
   const [form] = Form.useForm();
+  const navigate = useNavigate();
 
-  const onFinish: FormProps<FieldType>["onFinish"] = (values) => {
-    console.log("Success:", values);
+  const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
+    try {
+      const payload = {
+        name: values.fullName,
+        email: values.email,
+        password: values.password,
+        phone: values.phoneNumber || "",
+        role: ["685bfd49654ce0bb55969f51"], // 👈 Cambia por el ID real de rol por defecto
+      };
+
+      const response = await fetch("http://localhost:3000/app/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.error || "Error al registrar el usuario");
+      }
+
+      form.resetFields();
+      alert("Registro exitoso. Ahora puedes iniciar sesión.");
+      navigate("/login");
+    } catch (error) {
+      console.error("Error al registrar usuario:", error);
+    }
   };
 
   const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (
@@ -37,7 +67,6 @@ function RegisterForm() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
-      {/* CAMBIO AQUÍ: max-w-lg a max-w-2xl */}
       <div className="max-w-2xl w-full space-y-8 bg-white p-10 rounded-xl shadow-lg">
         <div className="flex justify-center">
           <svg
@@ -71,14 +100,15 @@ function RegisterForm() {
         >
           <Form.Item<FieldType>
             label={
-              <span className="text-sm font-medium text-gray-700">
-                Username
-              </span>
+              <span className="text-sm font-medium text-gray-700">Email</span>
             }
             name="email"
             rules={[
-              { required: true, message: "Please input your email address!" },
-              { type: "email", message: "Please enter a valid email address!" },
+              {
+                required: true,
+                message: "Por favor introduce tu correo electrónico",
+              },
+              { type: "email", message: "Introduce un correo válido" },
             ]}
             className="mb-4"
           >
@@ -91,17 +121,22 @@ function RegisterForm() {
 
           <Form.Item<FieldType>
             label={
-              <span className="text-sm font-medium text-gray-700">Nombre</span>
+              <span className="text-sm font-medium text-gray-700">
+                Nombre completo
+              </span>
             }
             name="fullName"
             rules={[
-              { required: true, message: "Please input your full name!" },
+              {
+                required: true,
+                message: "Por favor introduce tu nombre completo",
+              },
             ]}
             className="mb-4"
           >
             <Input
               size="large"
-              placeholder="Your full name"
+              placeholder="Juan Pérez"
               className="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
             />
           </Form.Item>
@@ -109,13 +144,16 @@ function RegisterForm() {
           <Form.Item<FieldType>
             label={
               <span className="text-sm font-medium text-gray-700">
-                Password
+                Contraseña
               </span>
             }
             name="password"
             rules={[
-              { required: true, message: "Please input your password!" },
-              { min: 6, message: "Password must be at least 6 characters!" },
+              { required: true, message: "Por favor introduce una contraseña" },
+              {
+                min: 6,
+                message: "La contraseña debe tener al menos 6 caracteres",
+              },
             ]}
             hasFeedback
             className="mb-4"
@@ -130,23 +168,21 @@ function RegisterForm() {
           <Form.Item<FieldType>
             label={
               <span className="text-sm font-medium text-gray-700">
-                Confirmar password
+                Confirmar contraseña
               </span>
             }
             name="confirmPassword"
             dependencies={["password"]}
             hasFeedback
             rules={[
-              { required: true, message: "Please confirm your password!" },
+              { required: true, message: "Confirma tu contraseña" },
               ({ getFieldValue }) => ({
                 validator(_, value) {
                   if (!value || getFieldValue("password") === value) {
                     return Promise.resolve();
                   }
                   return Promise.reject(
-                    new Error(
-                      "The two passwords that you entered do not match!"
-                    )
+                    new Error("Las contraseñas no coinciden")
                   );
                 },
               }),
@@ -170,7 +206,7 @@ function RegisterForm() {
             rules={[
               {
                 pattern: /^[0-9\s-()]*$/,
-                message: "Please enter a valid phone number.",
+                message: "Introduce un teléfono válido",
               },
             ]}
             className="mb-4"
@@ -187,7 +223,7 @@ function RegisterForm() {
               <span className="text-sm font-medium text-gray-700">País</span>
             }
             name="country"
-            rules={[{ required: true, message: "Please select your country!" }]}
+            rules={[{ required: true, message: "Selecciona tu país" }]}
             className="mb-6"
           >
             <Select
